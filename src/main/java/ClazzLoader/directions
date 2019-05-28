@@ -1,0 +1,39 @@
+实现自定义类加载器，应该继承抽闲类ClassLoader
+JVM类加载器的分层为：
+BootStrap ClassLoader，用来加载java的核心库类，该这些类一般具有native关键字，由C++实现。或者加载-Xbootclasspath指定路径下的类，以及<JAVA_HOME>/jre/lib下的类
+Ext ClassLoader，用来加载java的一些扩展类库，加载路径为<JAVA_HOME>/jre/lib/ext或者由java.ext.dir指定的路径的类
+Application ClassLoader，用来加载Classpath下的类。加载路径为Classpath
+用户自定义ClassLoader，加载指定的类文件
+
+类加载器的双亲委派机制为：当前的类加载器加载类的时候，首先会将这个加载类的任务委托给父类加载器。每个类加载器都是如此。
+当父类加载器在自己加载类的范围内找不到这个类的时候，子类加载器才会自己去加载。
+双亲委派模型的优势：能够避免Class文件的重复加载。如果每一个ClassLoader各自加载各自的，会导致内存可能出现相同的字节码文件，浪费内存空间。
+
+LoadClass抽象类的源码如下:
+        try {
+                if (parent != null) {
+                    c = parent.loadClass(name, false);
+                } else {
+                    c = findBootstrapClassOrNull(name);
+                }
+        } catch (ClassNotFoundException e) {
+                // ClassNotFoundException thrown if class not found
+                // from the non-null parent class loader
+            }
+
+            if (c == null) {
+                // If still not found, then invoke findClass in order
+                // to find the class.
+                long t1 = System.nanoTime();
+                c = findClass(name);
+
+                // this is the defining class loader; record the stats
+                sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);
+                sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+                sun.misc.PerfCounter.getFindClasses().increment();
+            }
+
+根据源码可知，当前类加载器加载类时会调用findClass函数，因此用户自定义类加载器需要重写这个函数。
+defineClass函数的作用是，将一个字节数组转换成为Class对象。因此在findClass方法中应该调用该方法。
+
+基本业务逻辑是：findClass函数将字节码转换成为byte数组，再将该数组交给defineClass函数进行处理
