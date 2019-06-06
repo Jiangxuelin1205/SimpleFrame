@@ -2,23 +2,19 @@ package IoC.Util;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class PacketScanner {
-
-    //使用set，无序
 
     /**
      * 将带有Bean注解的类放入List里
      **/
-    public static List<Class> findClassesWithAnnotations(String packageName, Class annotation) throws PackageScannerException {
-        List<Class> classesWithAnnotations = new ArrayList<>();
-        List<Class> classes = new ArrayList<>();
+    public static Set<Class> findClassesWithAnnotations(String packageName, Class type) throws PackageScannerException {
+        Set<Class> classesWithAnnotations = new HashSet<>();
+        Set<Class> classes = new HashSet<>();
         addClasses(directories(packageName), packageName, classes);
         for (Class clazz : classes) {
-            if (clazz.isAnnotationPresent(annotation)) {
+            if (clazz.isAnnotationPresent(type)) {
                 classesWithAnnotations.add(clazz);
             }
         }
@@ -28,7 +24,7 @@ public class PacketScanner {
     /**
      * 扫描指定路径,将路径下所有的类放入list里
      **/
-    public static void addClasses(File[] files, String packageName, List<Class> classes) throws PackageScannerException {
+    public static void addClasses(File[] files, String packageName, Set<Class> classes) throws PackageScannerException {
         for (File file : files) {
             if (file.isFile() && file.getName().endsWith(".class")) {
                 try {
@@ -43,7 +39,8 @@ public class PacketScanner {
     }
 
     /**
-     * 加载出某一个指定路径下的所有路径
+     * @param packageName 包名，形如 TestClassPacket.InnerClass
+     *                    加载该包下的所有的类和文件
      **/
     public static File[] directories(String packageName) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();

@@ -7,45 +7,57 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class ApplicationContextTest {
 
     @Test
     public void add_directories() {
-        File[] files = PacketScanner.directories("IoC.TestClassPacket");
-        Assert.assertEquals(files.length, 3);
+        File[] files = PacketScanner.directories("TestClassPacket");
+        String[] paths = new String[files.length];
+        for (int i = 0; i < paths.length; i++) {
+            paths[i] = files[i].getPath();
+        }
+        String[] expectedFiles = new String[]{
+                "G:\\IntelleJIdeaWorkingPlace\\SimpleFrame\\target\\test-classes\\TestClassPacket\\Dog.class",
+                "G:\\IntelleJIdeaWorkingPlace\\SimpleFrame\\target\\test-classes\\TestClassPacket\\InnerPacket",
+                "G:\\IntelleJIdeaWorkingPlace\\SimpleFrame\\target\\test-classes\\TestClassPacket\\Person.class"
+        };
+        Assert.assertArrayEquals(expectedFiles, paths);
     }
 
     @Test
     public void add_classes() throws PackageScannerException {
-        File[] files = PacketScanner.directories("IoC.TestClassPacket");
-        List<Class> classes = new ArrayList<>();
-        PacketScanner.addClasses(files, "IoC.TestClassPacket", classes);
-        Assert.assertEquals(classes.size(), 4);
+        //given
+        Set<Class> types = new HashSet<>();
+        //when
+        File[] files = PacketScanner.directories("TestClassPacket");
+        PacketScanner.addClasses(files, "TestClassPacket", types);
+        //then
+        Assert.assertTrue(types.contains(TestClassPacket.Dog.class));
+        Assert.assertTrue(types.contains(TestClassPacket.InnerPacket.Cat.class));
+        Assert.assertTrue(types.contains(TestClassPacket.InnerPacket.Jam.class));
+        Assert.assertTrue(types.contains(TestClassPacket.Person.class));
+        Assert.assertEquals(types.size(), 4);
     }
 
     @Test
     public void find_class_with_annotations() throws PackageScannerException {
-        List<Class> classesWithAnnotations = PacketScanner.findClassesWithAnnotations("IoC.TestClassPacket", Bean.class);
+        Set<Class> classesWithAnnotations = PacketScanner.findClassesWithAnnotations("TestClassPacket", Bean.class);
+        Assert.assertTrue(classesWithAnnotations.contains(TestClassPacket.InnerPacket.Cat.class));
+        Assert.assertTrue(classesWithAnnotations.contains(TestClassPacket.Dog.class));
+        Assert.assertTrue(classesWithAnnotations.contains(TestClassPacket.Person.class));
         Assert.assertEquals(classesWithAnnotations.size(), 3);
-//        Assert.assertEquals();
     }
 
     @Test
     public void refresh_test() throws CreateBeansException, PackageScannerException {
-        Set<String> packets = new HashSet<>();
-        packets.add("IoC.TestClassPacket");
-        ApplicationContext applicationContext = new ApplicationContext(packets);
+        ApplicationContext applicationContext = new ApplicationContext("TestClassPacket");
     }
 
     @Test
     public void create_bean_test() throws CreateBeansException, PackageScannerException {
-        Set<String> packets = new HashSet<>();
-        packets.add("IoC.TestClassPacket");
-        ApplicationContext applicationContext = new ApplicationContext(packets);
+        ApplicationContext applicationContext = new ApplicationContext("TestClassPacket");
     }
 }
