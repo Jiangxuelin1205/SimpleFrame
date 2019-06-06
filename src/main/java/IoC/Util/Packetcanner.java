@@ -1,22 +1,27 @@
 package IoC.Util;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 
-public class PackageScanner {
+public class Packetcanner {
 
     /**
      * 将带有Bean注解的类放入List里
      **/
-    /*public static List<Class<?>> findClassesWithAnnotations(String path, Class<?> clazz) {
+    public static List<Class<?>> findClassesWithAnnotations(String packageName, Class<?> annotation) throws ClassNotFoundException {
         List<Class<?>> classesWithAnnotations = new ArrayList<>();
+        List<Class<?>> classes = new ArrayList<>();
+        addClasses(directories(packageName), packageName, classes);
+        for (Class clazz : classes) {
+            if (clazz.isAnnotationPresent(annotation)) {
+                classesWithAnnotations.add(clazz);
+            }
+        }
         return classesWithAnnotations;
-    }*/
+    }
 
     /**
      * 扫描指定路径,将路径下所有的类放入list里
