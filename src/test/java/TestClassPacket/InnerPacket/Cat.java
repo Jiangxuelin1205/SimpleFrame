@@ -1,4 +1,4 @@
-package IoC.TestClassPacket.InnerPacket;
+package TestClassPacket.InnerPacket;
 
 import IoC.Annotations.Bean;
 import IoC.Annotations.Value;
