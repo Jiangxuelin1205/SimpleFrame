@@ -19,16 +19,16 @@ public class PackageScanner {
     }*/
 
     /**
-     * 扫描指定路径,将所有的类放入list里
+     * 扫描指定路径,将路径下所有的类放入list里
      **/
-    public static void addClasses(File[] files, String packageName,List<Class<?>> classes) throws ClassNotFoundException {
-       for(File file:files){
-           if(file.isFile()){
-               classes.add(Class.forName(packageName+"."+file.getName().substring(file.getName().length()-6)));
-           }else{
-               addClasses(Objects.requireNonNull(file.listFiles()),packageName+"."+file.getName(),classes);
-           }
-       }
+    public static void addClasses(File[] files, String packageName, List<Class<?>> classes) throws ClassNotFoundException {
+        for (File file : files) {
+            if (file.isFile() && file.getName().endsWith(".class")) {
+                classes.add(Class.forName(packageName + "." + file.getName().substring(0, file.getName().length() - 6)));
+            } else {
+                addClasses(Objects.requireNonNull(file.listFiles()), packageName + "." + file.getName(), classes);
+            }
+        }
     }
 
     /**
@@ -37,7 +37,7 @@ public class PackageScanner {
     public static File[] directories(String packageName) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         String path = packageName.replace(".", "/");
-        URL resource=classLoader.getResource(path);
+        URL resource = classLoader.getResource(path);
         assert resource != null;
         return new File(resource.getPath()).listFiles();
     }
