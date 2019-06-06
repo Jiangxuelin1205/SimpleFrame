@@ -6,6 +6,7 @@ import IoC.Util.PacketScanner;
 import TestClassPacket.InnerPacket.Cat;
 import TestClassPacket.TestClass;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -60,8 +61,11 @@ public class ApplicationContextTest {
     @Test
     public void refresh_test() throws CreateBeansException, PackageScannerException {
         ApplicationContext applicationContext = new ApplicationContext("TestClassPacket");
-        Cat cat = (Cat) applicationContext.getBean(Cat.class);
-        Assert.assertEquals(cat.name, "ctct");
-        Assert.assertEquals(cat.roar, "niangniang");
+        Object[] parameters=new Object[]{
+                "niang","ctct"
+        };
+        Cat cat= (Cat) applicationContext.setBean("Cat",parameters);
+
     }
+
 }

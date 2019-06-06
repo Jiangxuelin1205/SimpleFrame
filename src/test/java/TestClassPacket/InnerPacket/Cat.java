@@ -3,12 +3,10 @@ package TestClassPacket.InnerPacket;
 import IoC.Annotations.Bean;
 import IoC.Annotations.Value;
 
-@Bean
+@Bean(id = "Cat")
 public class Cat {
 
-    @Value(value = "niangniang")
     public String roar;
 
-    @Value(value = "ctct")
     public String name;
 }

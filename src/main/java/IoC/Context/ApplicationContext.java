@@ -21,23 +21,31 @@ public class ApplicationContext implements BeanFactory {
     private String[] basePacket;
 
     /**
-     * 按照Bean的名称存储, String为Bean的名称，Object为Bean的实例
-     */
-    private final Map<String, Object> names = new ConcurrentHashMap<>();
-
-    /**
      * 按照Bean的内容存储，Class
      **/
-    private final Map<Class<?>, Object> types = new ConcurrentHashMap<>();//键为Bean的类型，值为Bean的名称
+    private final Map<String, Class<?>> types = new ConcurrentHashMap<>();//键为Bean的类型，值为Bean的名称
+
 
     @Override
-    public Object getBean(String name) {
-        return names.get(name);
+    public Class<?> getBean(String id) {
+        return types.get(id);
     }
 
     @Override
-    public <T> Object getBean(Class<T> type) {
-        return types.get(type);
+    public Object setBean(String id, Object... parameters) throws CreateBeansException {
+        Class bean = types.get(id);
+        Object o = null;
+        try {
+            o = bean.newInstance();
+            Field[] fields = bean.getDeclaredFields();
+            int i = 0;
+            for (Object parameter : parameters) {
+                fields[i++].set(o, parameter);
+            }
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new CreateBeansException(e.getCause());
+        }
+        return o;
     }
 
 
@@ -53,50 +61,20 @@ public class ApplicationContext implements BeanFactory {
     /**
      * 获取指定Packet中的类，并将器存储入map中。map的键为类类型，map的值为实例
      **/
-    private void refresh() throws CreateBeansException, PackageScannerException {
+    private void refresh() throws PackageScannerException {
         for (String packetName : basePacket) {
             Set<Class<?>> classes = PacketScanner.findClassesWithAnnotations(packetName, Bean.class);
-            for (Class clazz : classes) {
-                createBeans(clazz);
+            for (Class type : classes) {
+                save(type);
             }
         }
     }
 
-    /**
-     * @param beanClass 需要进行实例化的类类型
-     */
-    private void createBeans(Class beanClass) throws CreateBeansException {
-        if (types.get(beanClass) != null) {
-            return;
+    private void save(Class<?> type) {
+        if (type.isAnnotationPresent(Bean.class)) {
+            Bean bean = type.getAnnotation(Bean.class);
+            types.put(bean.id(), type);
         }
-        try {
-            @SuppressWarnings("unchecked")
-            Constructor constructor = beanClass.getConstructor();
-            Object o = constructor.newInstance();
-            Field[] fields = beanClass.getDeclaredFields();
-            for (Field field : fields) {
-                if (field.isAnnotationPresent(Value.class)) {
-                    Value value = field.getAnnotation(Value.class);
-                    field.setAccessible(true);
-                    field.set(o, value.value());
-                } else if (field.isAnnotationPresent(Autowired.class)) {
-                    Autowired autowired = field.getAnnotation(Autowired.class);
-                    //如果该类上面有Autowired注解，则，查看该类是否被加载；如果没有被加载，则加载类；
-                    if (types.get(field.getClass()) != null) {
-                        field.setAccessible(true);
-                        field.set(o, types.get(field.getClass()));
-                    } else {
-                        Class<?> type = field.getType();
-                        createBeans(type);
-                    }
-                }
-            }
-            types.put(beanClass, o);
-            System.out.println(beanClass.getName());
-            names.put(beanClass.getName(), o);
-        } catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new CreateBeansException(e);
-        }
-
     }
+
 }

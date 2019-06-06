@@ -1,11 +1,10 @@
 package TestClassPacket;
 
 import IoC.Annotations.Bean;
-import IoC.Annotations.Value;
 
-@Bean
+
+@Bean(id = "TestClass")
 public class TestClass {
 
-    @Value("test")
     String name;
 }
