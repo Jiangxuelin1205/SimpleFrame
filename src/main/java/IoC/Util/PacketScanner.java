@@ -1,6 +1,7 @@
 package IoC.Util;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.*;
 
@@ -9,11 +10,11 @@ public class PacketScanner {
     /**
      * 将带有Bean注解的类放入List里
      **/
-    public static Set<Class> findClassesWithAnnotations(String packageName, Class type) throws PackageScannerException {
-        Set<Class> classesWithAnnotations = new HashSet<>();
-        Set<Class> classes = new HashSet<>();
+    public static Set<Class<?>> findClassesWithAnnotations(String packageName, Class<? extends Annotation> type) throws PackageScannerException {
+        Set<Class<?>> classesWithAnnotations = new HashSet<>();
+        Set<Class<?>> classes = new HashSet<>();
         addClasses(directories(packageName), packageName, classes);
-        for (Class clazz : classes) {
+        for (Class<?> clazz : classes) {
             if (clazz.isAnnotationPresent(type)) {
                 classesWithAnnotations.add(clazz);
             }
@@ -24,7 +25,7 @@ public class PacketScanner {
     /**
      * 扫描指定路径,将路径下所有的类放入list里
      **/
-    public static void addClasses(File[] files, String packageName, Set<Class> classes) throws PackageScannerException {
+    public static void addClasses(File[] files, String packageName, Set<Class<?>> classes) throws PackageScannerException {
         for (File file : files) {
             if (file.isFile() && file.getName().endsWith(".class")) {
                 try {

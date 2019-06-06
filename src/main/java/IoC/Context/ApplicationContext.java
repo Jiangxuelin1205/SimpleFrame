@@ -1,5 +1,6 @@
 package IoC.Context;
 
+import IoC.Annotations.Autowired;
 import IoC.Annotations.Bean;
 import IoC.Annotations.Value;
 import IoC.Util.PackageScannerException;
@@ -35,8 +36,8 @@ public class ApplicationContext implements BeanFactory {
     }
 
     @Override
-    public <T> Object getBean(Class<T> clazz) {
-        return types.get(clazz);
+    public <T> Object getBean(Class<T> type) {
+        return types.get(type);
     }
 
 
@@ -54,7 +55,7 @@ public class ApplicationContext implements BeanFactory {
      **/
     private void refresh() throws CreateBeansException, PackageScannerException {
         for (String packetName : basePacket) {
-            Set<Class> classes = PacketScanner.findClassesWithAnnotations(packetName, Bean.class);
+            Set<Class<?>> classes = PacketScanner.findClassesWithAnnotations(packetName, Bean.class);
             for (Class clazz : classes) {
                 createBeans(clazz);
             }
@@ -62,30 +63,37 @@ public class ApplicationContext implements BeanFactory {
     }
 
     /**
-     *
      * @param beanClass 需要进行实例化的类类型
      */
     private void createBeans(Class beanClass) throws CreateBeansException {
-        //如果class已经存在List中,则返回
         if (types.get(beanClass) != null) {
             return;
         }
-
         try {
-            //否则创建class，并且将class放入classesMap中
             @SuppressWarnings("unchecked")
             Constructor constructor = beanClass.getConstructor();
             Object o = constructor.newInstance();
             Field[] fields = beanClass.getDeclaredFields();
-            //通过注解初始化参数
             for (Field field : fields) {
                 if (field.isAnnotationPresent(Value.class)) {
                     Value value = field.getAnnotation(Value.class);
                     field.setAccessible(true);
                     field.set(o, value.value());
+                } else if (field.isAnnotationPresent(Autowired.class)) {
+                    Autowired autowired = field.getAnnotation(Autowired.class);
+                    //如果该类上面有Autowired注解，则，查看该类是否被加载；如果没有被加载，则加载类；
+                    if (types.get(field.getClass()) != null) {
+                        field.setAccessible(true);
+                        field.set(o, types.get(field.getClass()));
+                    } else {
+                        Class<?> type = field.getType();
+                        createBeans(type);
+                    }
                 }
             }
             types.put(beanClass, o);
+            System.out.println(beanClass.getName());
+            names.put(beanClass.getName(), o);
         } catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new CreateBeansException(e);
         }

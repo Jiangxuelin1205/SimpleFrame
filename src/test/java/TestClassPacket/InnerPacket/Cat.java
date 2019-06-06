@@ -6,9 +6,9 @@ import IoC.Annotations.Value;
 @Bean
 public class Cat {
 
-    @Value(value="niangniang")
-    private String roar;
+    @Value(value = "niangniang")
+    public String roar;
 
     @Value(value = "ctct")
-    private String name;
+    public String name;
 }
