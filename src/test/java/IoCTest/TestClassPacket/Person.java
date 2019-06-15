@@ -1,8 +1,6 @@
-package TestClassPacket;
+package IoCTest.TestClassPacket;
 
-import IoC.Annotations.Autowired;
 import IoC.Annotations.Bean;
-import IoC.Annotations.Value;
 
 
 @Bean(id="Person")

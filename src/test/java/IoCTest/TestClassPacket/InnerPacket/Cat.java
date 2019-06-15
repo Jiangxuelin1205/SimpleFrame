@@ -1,7 +1,6 @@
-package TestClassPacket.InnerPacket;
+package IoCTest.TestClassPacket.InnerPacket;
 
 import IoC.Annotations.Bean;
-import IoC.Annotations.Value;
 
 @Bean(id = "Cat")
 public class Cat {

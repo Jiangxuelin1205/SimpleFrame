@@ -1,3 +1,4 @@
+package ClassLoaderTest;
 
 import ClazzLoader.MyClassLoader;
 import org.junit.Test;

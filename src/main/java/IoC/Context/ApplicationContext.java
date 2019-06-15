@@ -1,14 +1,10 @@
 package IoC.Context;
 
-import IoC.Annotations.Autowired;
 import IoC.Annotations.Bean;
-import IoC.Annotations.Value;
 import IoC.Util.PackageScannerException;
 import IoC.Util.PacketScanner;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +30,7 @@ public class ApplicationContext implements BeanFactory {
     @Override
     public Object setBean(String id, Object... parameters) throws CreateBeansException {
         Class bean = types.get(id);
-        Object o = null;
+        Object o;
         try {
             o = bean.newInstance();
             Field[] fields = bean.getDeclaredFields();

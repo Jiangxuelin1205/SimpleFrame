@@ -40,7 +40,7 @@ public class PacketScanner {
     }
 
     /**
-     * @param packageName 包名，形如 TestClassPacket.InnerClass
+     * @param packageName 包名，形如 IoCTest.TestClassPacket.InnerClass
      *                    加载该包下的所有的类和文件
      **/
     public static File[] directories(String packageName) {

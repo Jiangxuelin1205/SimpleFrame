@@ -1,4 +1,4 @@
-package TestClassPacket;
+package IoCTest.TestClassPacket;
 
 import IoC.Annotations.Bean;
 
