@@ -7,7 +7,7 @@ import MiniSpring.web.mvc.RequestParam;
 @Controller
 public class AgeController {
 
-    @RequestMapping("/age.json")
+    @RequestMapping("age.json")
     public void getAge(@RequestParam("name") String name, @RequestParam("age") String age) {
         System.out.println(name + " is " + age + " years old.");
     }

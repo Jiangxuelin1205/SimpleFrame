@@ -7,7 +7,7 @@ import MiniSpring.web.mvc.RequestParam;
 @Controller
 public class SalaryController {
 
-    @RequestMapping("/salary.json")
+    @RequestMapping("salary.json")
     public Integer getSalary(@RequestParam("name") String name, @RequestParam("experience") String experience) {
         return 10000;
     }

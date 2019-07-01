@@ -2,6 +2,7 @@ package IoC.Util;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
@@ -47,7 +48,12 @@ public class PacketScanner {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         String path = packageName.replace(".", "/");
         URL resource = classLoader.getResource(path);
+
         assert resource != null;
+        File[] files=new File(resource.getPath()).listFiles();
+        for(File file:files){
+            System.out.println(file.getAbsolutePath());
+        }
         return new File(resource.getPath()).listFiles();
     }
 }
